@@ -38,7 +38,7 @@
                 <div class="welcome-label">SCHEDUTRACK</div>
                 <h1 id="algorithmTitle">First Come, First Served</h1>
                 <p id="algorithmDescription">
-                    Processes are executed in the order they arrive.
+                    Processes are executed in the order they are added.
                 </p>
                 <span id="selectedAlgorithm" class="algorithm-tag">FCFS</span>
             </div>
@@ -57,19 +57,6 @@
                     <div class="input-group">
                         <label for="processID">Process ID</label>
                         <input type="text" id="processID" placeholder="e.g. P1">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="arrivalTime">Arrival Time (ms)</label>
-                        <div class="number-stepper">
-                            <button type="button" class="step-button"
-                                onclick="SamyangChangeValue('arrivalTime', -1)"
-                                aria-label="Decrease arrival time">−</button>
-                            <input type="number" id="arrivalTime" min="0" step="any" placeholder="0">
-                            <button type="button" class="step-button"
-                                onclick="SamyangChangeValue('arrivalTime', 1)"
-                                aria-label="Increase arrival time">+</button>
-                        </div>
                     </div>
 
                     <div class="input-group">
@@ -124,7 +111,6 @@
                         <thead>
                             <tr>
                                 <th>PROCESS ID</th>
-                                <th>ARRIVAL TIME (MS)</th>
                                 <th>BURST TIME (MS)</th>
                                 <th class="priority-column hidden">PRIORITY</th>
                                 <th>ACTION</th>
@@ -211,7 +197,6 @@
                         <thead>
                             <tr>
                                 <th>PROCESS ID</th>
-                                <th>ARRIVAL TIME (MS)</th>
                                 <th>BURST TIME (MS)</th>
                                 <th>COMPLETION TIME (MS)</th>
                                 <th>TURNAROUND TIME (MS)</th>

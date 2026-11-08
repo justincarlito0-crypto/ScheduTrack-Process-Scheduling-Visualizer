@@ -6,6 +6,10 @@ let SamyangSchedule = [];
 let SamyangResults = [];
 let SamyangEditingProcessIndex = null;
 
+SamyangProcesses.forEach((process, index) => {
+    process.order = index;
+});
+
 const SamyangAlgorithm =
     new URLSearchParams(window.location.search).get("algorithm") || "fcfs";
 
@@ -251,33 +255,29 @@ function SamyangCloseMessagePopup() {
 
 function SamyangAddProcess() {
     const idInput = document.getElementById("processID");
-    const arrivalInput = document.getElementById("arrivalTime");
     const burstInput = document.getElementById("burstTime");
     const priorityInput = document.getElementById("priority");
 
-    if (!idInput || !arrivalInput || !burstInput) {
+    if (!idInput || !burstInput) {
         console.error("Process input fields could not be found.");
         return;
     }
 
     const id = idInput.value.trim();
-    const arrivalText = arrivalInput.value.trim();
     const burstText = burstInput.value.trim();
-
-    const arrival = Number(arrivalText);
     const burst = Number(burstText);
 
     let priority = 0;
 
-    if (priorityInput && SamyangAlgorithm === "priority") {
-        const priorityText = priorityInput.value.trim();
+    if (SamyangAlgorithm === "priority") {
+        const priorityText = priorityInput ? priorityInput.value.trim() : "";
 
         if (priorityText === "") {
             SamyangShowMessage(
                 "Priority Required",
                 "Please enter a priority value."
             );
-            priorityInput.focus();
+            if (priorityInput) priorityInput.focus();
             return;
         }
 
@@ -288,12 +288,12 @@ function SamyangAddProcess() {
                 "Invalid Priority",
                 "Please enter a valid priority number."
             );
-            priorityInput.focus();
+            if (priorityInput) priorityInput.focus();
             return;
         }
     }
 
-    if (id === "" || arrivalText === "" || burstText === "") {
+    if (id === "" || burstText === "") {
         SamyangShowMessage(
             "Missing Information",
             "Please complete the required fields."
@@ -301,8 +301,6 @@ function SamyangAddProcess() {
 
         if (id === "") {
             idInput.focus();
-        } else if (arrivalText === "") {
-            arrivalInput.focus();
         } else {
             burstInput.focus();
         }
@@ -310,16 +308,12 @@ function SamyangAddProcess() {
         return;
     }
 
-    if (
-        !Number.isFinite(arrival) ||
-        !Number.isFinite(burst) ||
-        arrival < 0 ||
-        burst <= 0
-    ) {
+    if (!Number.isFinite(burst) || burst <= 0) {
         SamyangShowMessage(
-            "Invalid Process Values",
-            "Arrival time must be 0 or higher, and burst time must be greater than 0."
+            "Invalid Burst Time",
+            "Burst time must be greater than 0."
         );
+        burstInput.focus();
         return;
     }
 
@@ -338,7 +332,6 @@ function SamyangAddProcess() {
 
     const newProcess = {
         id: id,
-        arrival: arrival,
         burst: burst,
         priority: priority,
         order: SamyangProcesses.length
@@ -350,7 +343,6 @@ function SamyangAddProcess() {
     SamyangRenderProcessTable();
 
     idInput.value = "";
-    arrivalInput.value = "";
     burstInput.value = "";
 
     if (priorityInput) {
@@ -383,19 +375,16 @@ function SamyangSaveProcessEdit(index) {
     if (index < 0 || index >= SamyangProcesses.length) return;
 
     const idInput = document.getElementById(`editProcessID-${index}`);
-    const arrivalInput = document.getElementById(`editArrivalTime-${index}`);
     const burstInput = document.getElementById(`editBurstTime-${index}`);
     const priorityInput = document.getElementById(`editPriority-${index}`);
 
-    if (!idInput || !arrivalInput || !burstInput) return;
+    if (!idInput || !burstInput) return;
 
     const id = idInput.value.trim();
-    const arrivalText = arrivalInput.value.trim();
     const burstText = burstInput.value.trim();
-    const arrival = Number(arrivalText);
     const burst = Number(burstText);
 
-    if (id === "" || arrivalText === "" || burstText === "") {
+    if (id === "" || burstText === "") {
         SamyangShowMessage(
             "Missing Information",
             "Please complete all process fields before saving."
@@ -403,15 +392,10 @@ function SamyangSaveProcessEdit(index) {
         return;
     }
 
-    if (
-        !Number.isFinite(arrival) ||
-        !Number.isFinite(burst) ||
-        arrival < 0 ||
-        burst <= 0
-    ) {
+    if (!Number.isFinite(burst) || burst <= 0) {
         SamyangShowMessage(
-            "Invalid Process Values",
-            "Arrival time must be 0 or higher, and burst time must be greater than 0."
+            "Invalid Burst Time",
+            "Burst time must be greater than 0."
         );
         return;
     }
@@ -450,7 +434,6 @@ function SamyangSaveProcessEdit(index) {
     SamyangProcesses[index] = {
         ...SamyangProcesses[index],
         id: id,
-        arrival: arrival,
         burst: burst,
         priority: priority
     };
@@ -648,13 +631,6 @@ function SamyangRenderProcessTable() {
                 </td>
 
                 <td>
-                    <input class="table-edit-input" type="number" min="0" step="any"
-                        id="editArrivalTime-${index}"
-                        value="${process.arrival}"
-                        aria-label="Edit arrival time in milliseconds">
-                </td>
-
-                <td>
                     <input class="table-edit-input" type="number" min="0.01" step="any"
                         id="editBurstTime-${index}"
                         value="${process.burst}"
@@ -680,7 +656,6 @@ function SamyangRenderProcessTable() {
         } else {
             row.innerHTML = `
                 <td>${SamyangEscapeHTML(process.id)}</td>
-                <td>${process.arrival}</td>
                 <td>${process.burst}</td>
                 <td class="${isPriority ? "" : "hidden"}">
                     ${process.priority ?? 0}
@@ -710,47 +685,24 @@ function SamyangScheduleProcesses(algorithm) {
     SamyangSchedule = [];
 
     while (remaining.length > 0) {
-        const available = remaining.filter(
-            process => process.arrival <= currentTime
-        );
-
-        if (available.length === 0) {
-            const nextArrival = Math.min(
-                ...remaining.map(process => process.arrival)
-            );
-
-            SamyangSchedule.push({
-                id: "Idle",
-                start: currentTime,
-                end: nextArrival,
-                idle: true
-            });
-
-            currentTime = nextArrival;
-            continue;
-        }
-
         let selected;
 
         if (algorithm === "fcfs") {
-            selected = available.sort((a, b) =>
-                a.arrival - b.arrival ||
+            selected = remaining.sort((a, b) =>
                 a.order - b.order
             )[0];
         }
 
         else if (algorithm === "sjf") {
-            selected = available.sort((a, b) =>
+            selected = remaining.sort((a, b) =>
                 a.burst - b.burst ||
-                a.arrival - b.arrival ||
                 a.order - b.order
             )[0];
         }
 
         else {
-            selected = available.sort((a, b) =>
+            selected = remaining.sort((a, b) =>
                 a.priority - b.priority ||
-                a.arrival - b.arrival ||
                 a.order - b.order
             )[0];
         }
@@ -783,7 +735,7 @@ function SamyangCalculateResults() {
         );
 
         const completion = scheduled.end;
-        const turnaround = completion - process.arrival;
+        const turnaround = completion;
         const waiting = turnaround - process.burst;
 
         return {
@@ -907,7 +859,6 @@ function SamyangRenderResultsTable() {
                 ${SamyangEscapeHTML(process.id)}
             </td>
 
-            <td>${process.arrival}</td>
             <td>${process.burst}</td>
 
             <td>
@@ -951,13 +902,10 @@ function SamyangRenderGanttChart() {
         const duration = item.end - item.start;
         const block = document.createElement("div");
 
-        if (item.idle) {
-            block.className = "gantt-block idle";
-        } else {
-            block.className =
-                `gantt-block process-${processColorIndex % 6}`;
-            processColorIndex++;
-        }
+        block.className =
+            `gantt-block process-${processColorIndex % 6}`;
+
+        processColorIndex++;
 
         block.style.flexGrow = Math.max(duration, 1);
         block.style.flexShrink = "0";
@@ -1020,19 +968,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const details = {
         fcfs: {
             title: "First Come, First Served",
-            description: "Processes are executed in the order they arrive.",
+            description: "Processes are executed in the order they are added.",
             tag: "FCFS"
         },
 
         sjf: {
             title: "Shortest Job First",
-            description: "The available process with the shortest burst time runs first.",
+            description: "The process with the shortest burst time runs first.",
             tag: "SJF"
         },
 
         priority: {
             title: "Priority Scheduling",
-            description: "The available process with the highest priority runs first. A smaller number means higher priority.",
+            description: "The process with the highest priority runs first. A smaller number means higher priority.",
             tag: "PRIORITY"
         }
     };
@@ -1099,7 +1047,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // PRESS ENTER TO ADD A PROCESS
 
-    ["processID", "arrivalTime", "burstTime", "priority"].forEach(id => {
+    ["processID", "burstTime", "priority"].forEach(id => {
         const input = document.getElementById(id);
 
         if (input) {
