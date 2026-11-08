@@ -207,12 +207,15 @@ a {
     height: 37px;
     display: grid;
     place-items: center;
-    color: var(--text);
-    background: var(--purple);
-    border: 1px solid var(--purple-dark);
+    flex-shrink: 0;
+
+    color: #ffffff;
+    background: #c9a34f;
+    border: 1px solid #b58d3d;
     border-radius: 9px;
-    font-size: 18px;
-    font-weight: 800;
+
+    font-size: 23px;
+    font-weight: 400;
 }
 
 
