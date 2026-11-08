@@ -1,3 +1,4 @@
+
 // CPU SCHEDULING SIMULATOR
 
 let SamyangProcesses = JSON.parse(localStorage.getItem("cpuLabProcesses")) || [];
@@ -51,6 +52,38 @@ function SamyangUpdateThemeButton() {
 window.toggleTheme = SamyangToggleTheme;
 
 
+// NUMBER STEPPERS
+
+function SamyangChangeValue(inputId, change) {
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    const minimum = input.min === ""
+        ? -Infinity
+        : Number(input.min);
+
+    const maximum = input.max === ""
+        ? Infinity
+        : Number(input.max);
+
+    const currentValue = input.value.trim() === ""
+        ? 0
+        : Number(input.value);
+
+    let newValue = currentValue + change;
+
+    newValue = Math.max(minimum, Math.min(maximum, newValue));
+
+    input.value = Number.isFinite(newValue)
+        ? parseFloat(newValue.toFixed(10))
+        : "";
+
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+
 // LOADING SCREEN
 
 function SamyangShowLoading(message, callback) {
@@ -94,8 +127,6 @@ function SamyangSetupHomePage() {
     const getStartedButton = document.getElementById("getStartedButton");
     const backButton = document.getElementById("backToWelcomeButton");
     const algorithmCards = document.querySelectorAll(".algorithm-card");
-
-    // OPEN ALGORITHM SELECTION DIRECTLY WHEN RETURNING FROM SIMULATOR
 
     const parameters = new URLSearchParams(window.location.search);
     const openSelection = parameters.get("select") === "1";
@@ -238,8 +269,6 @@ function SamyangAddProcess() {
 
     let priority = 0;
 
-    // CHECK PRIORITY FIRST
-
     if (priorityInput && SamyangAlgorithm === "priority") {
         const priorityText = priorityInput.value.trim();
 
@@ -264,8 +293,6 @@ function SamyangAddProcess() {
         }
     }
 
-    // CHECK REQUIRED FIELDS
-
     if (id === "" || arrivalText === "" || burstText === "") {
         SamyangShowMessage(
             "Missing Information",
@@ -283,8 +310,6 @@ function SamyangAddProcess() {
         return;
     }
 
-    // CHECK NUMERIC VALUES
-
     if (
         !Number.isFinite(arrival) ||
         !Number.isFinite(burst) ||
@@ -298,8 +323,6 @@ function SamyangAddProcess() {
         return;
     }
 
-    // CHECK DUPLICATE PROCESS ID
-
     const duplicate = SamyangProcesses.some(process =>
         process.id.toLowerCase() === id.toLowerCase()
     );
@@ -312,8 +335,6 @@ function SamyangAddProcess() {
         idInput.focus();
         return;
     }
-
-    // ADD NEW PROCESS
 
     const newProcess = {
         id: id,
@@ -395,8 +416,6 @@ function SamyangSaveProcessEdit(index) {
         return;
     }
 
-    // CHECK DUPLICATE ID
-
     const duplicate = SamyangProcesses.some((process, processIndex) =>
         processIndex !== index &&
         process.id.toLowerCase() === id.toLowerCase()
@@ -427,8 +446,6 @@ function SamyangSaveProcessEdit(index) {
 
         priority = Number(priorityText);
     }
-
-    // SAVE CHANGES
 
     SamyangProcesses[index] = {
         ...SamyangProcesses[index],
@@ -697,8 +714,6 @@ function SamyangScheduleProcesses(algorithm) {
             process => process.arrival <= currentTime
         );
 
-        // CPU IDLE TIME
-
         if (available.length === 0) {
             const nextArrival = Math.min(
                 ...remaining.map(process => process.arrival)
@@ -717,16 +732,12 @@ function SamyangScheduleProcesses(algorithm) {
 
         let selected;
 
-        // FCFS
-
         if (algorithm === "fcfs") {
             selected = available.sort((a, b) =>
                 a.arrival - b.arrival ||
                 a.order - b.order
             )[0];
         }
-
-        // SJF
 
         else if (algorithm === "sjf") {
             selected = available.sort((a, b) =>
@@ -735,8 +746,6 @@ function SamyangScheduleProcesses(algorithm) {
                 a.order - b.order
             )[0];
         }
-
-        // PRIORITY
 
         else {
             selected = available.sort((a, b) =>

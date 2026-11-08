@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +24,6 @@
         </div>
     </header>
 
-
     <main class="simulator-container">
 
         <!-- PROCESS INPUT VIEW -->
@@ -43,7 +43,6 @@
                 <span id="selectedAlgorithm" class="algorithm-tag">FCFS</span>
             </div>
 
-
             <section class="panel">
 
                 <div class="panel-heading">
@@ -52,7 +51,6 @@
                         <p>Enter the process details below.</p>
                     </div>
                 </div>
-
 
                 <div class="input-grid">
 
@@ -63,17 +61,41 @@
 
                     <div class="input-group">
                         <label for="arrivalTime">Arrival Time (ms)</label>
-                        <input type="number" id="arrivalTime" min="0" step="any" placeholder="0">
+                        <div class="number-stepper">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('arrivalTime', -1)"
+                                aria-label="Decrease arrival time">−</button>
+                            <input type="number" id="arrivalTime" min="0" step="any" placeholder="0">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('arrivalTime', 1)"
+                                aria-label="Increase arrival time">+</button>
+                        </div>
                     </div>
 
                     <div class="input-group">
                         <label for="burstTime">Burst Time (ms)</label>
-                        <input type="number" id="burstTime" min="0.01" step="any" placeholder="5">
+                        <div class="number-stepper">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('burstTime', -1)"
+                                aria-label="Decrease burst time">−</button>
+                            <input type="number" id="burstTime" min="0.01" step="any" placeholder="5">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('burstTime', 1)"
+                                aria-label="Increase burst time">+</button>
+                        </div>
                     </div>
 
                     <div class="input-group hidden" id="priorityGroup">
                         <label for="priority">Priority</label>
-                        <input type="number" id="priority" step="any" placeholder="1">
+                        <div class="number-stepper">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('priority', -1)"
+                                aria-label="Decrease priority">−</button>
+                            <input type="number" id="priority" step="any" placeholder="1">
+                            <button type="button" class="step-button"
+                                onclick="SamyangChangeValue('priority', 1)"
+                                aria-label="Increase priority">+</button>
+                        </div>
                     </div>
 
                 </div>
@@ -83,7 +105,6 @@
                 <button type="button" id="addProcessButton" class="primary-button">
                     Add Process <span>+</span>
                 </button>
-
 
                 <div class="queue-heading">
                     <div>
@@ -96,7 +117,6 @@
                         Clear All
                     </button>
                 </div>
-
 
                 <div class="table-wrapper">
 
@@ -120,7 +140,6 @@
 
                 </div>
 
-
                 <button type="button" id="runSimulationButton"
                         class="primary-button run-button">
                     Run Simulation <span>→</span>
@@ -129,7 +148,6 @@
             </section>
 
         </section>
-
 
         <!-- RESULTS VIEW -->
 
@@ -141,11 +159,9 @@
                 <p>Here is the scheduling result for your selected algorithm.</p>
             </div>
 
-
             <div class="results-toolbar">
                 <span id="resultsAlgorithm" class="algorithm-tag">FCFS</span>
             </div>
-
 
             <div class="stats-grid">
 
@@ -166,7 +182,6 @@
 
             </div>
 
-
             <section class="panel result-panel">
 
                 <div class="panel-heading">
@@ -181,7 +196,6 @@
                 </div>
 
             </section>
-
 
             <section class="panel result-panel">
 
@@ -211,7 +225,6 @@
 
             </section>
 
-
             <button type="button" id="runAgainButton"
                     class="primary-button run-button">
                 Edit Processes / Run Again
@@ -226,12 +239,10 @@
 
     </main>
 
-
     <footer class="site-footer">
         <span>ScheduTrack: Process Scheduling Visualizer</span>
         <span>Operating Systems Project</span>
     </footer>
-
 
     <!-- LOADING SCREEN -->
 
@@ -261,8 +272,6 @@
 
                         <rect x="51" y="51" width="78" height="78"
                               rx="14" fill="#a98236" stroke="#f0d99b" stroke-width="3"/>
-
-                        <!-- DATA FLOW SYMBOL -->
 
                         <g stroke="#ffffff" stroke-width="4" stroke-linecap="round">
                             <path d="M90 69 V81"/>
